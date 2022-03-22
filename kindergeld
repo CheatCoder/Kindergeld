@@ -1,0 +1,23 @@
+#!/bin/bash
+
+if [ "$1" == "" ]; then
+    me=`basename "$0"`
+    echo Usage:
+    echo $me kindergeldendnummer \(a\)ll/\(n\)ext
+    echo e.g.
+    echo $me 0 a // zeigt das jahr an
+    echo $me 5 n // zeigt den nächsten monat an
+    echo $me 7   // zeigt den aktuellen monat an
+    exit
+fi
+
+if [ "$2" == "n" ] || [ "$2" == "next" ]; then
+	tmp=$(date +%-m)
+elif [ "$2" == "a" ] || [ "$2" == "all" ]; then
+	tmp=""
+else
+	tmp=$(date +%-m)-1
+fi
+
+echo Kindergeld Endnummer $1
+curl -s https://www.arbeitsagentur.de/familie-und-kinder/auszahlungstermine | pup -c 'div[class=panel-body] json{}' | jq -r ".[$1] | .children[0].children[1].children | .[$tmp] | .text"
